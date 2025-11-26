@@ -3,9 +3,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { Any, Repository } from 'typeorm';
 import { UserSignupDto } from './dto/user-singup.dto';
-import { hash } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
+import { UserSignInDto } from './dto/user-signin.dto';
+import { sign } from 'jsonwebtoken';
 
 @Injectable()
 export class UsersService {
@@ -29,6 +31,18 @@ export class UsersService {
 
   }
 
+  async signIn(userSignInDto: UserSignInDto): Promise<UserEntity> {
+    const userExist = await this.userRepo.createQueryBuilder('users')
+      .addSelect('users.password').where('users.email=:email', { email: userSignInDto.email })
+      .getOne();
+    if (!userExist) throw new BadRequestException("email doesn't exist");
+    // if (!userExist.password) throw new BadRequestException('password not found');
+    const matechedPassword = await compare(userSignInDto.password, userExist.password!);
+    if (!matechedPassword) throw new BadRequestException('Bad credentials');
+    delete userExist.password;
+    return userExist;
+  }
+
   findAll() {
     return this.userRepo.find();
   }
@@ -37,10 +51,11 @@ export class UsersService {
     return this.userRepo.findOneBy({ id });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    const user = this.userRepo.findOneBy({ id });
+  async updateUser(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepo.findOneBy({ id });
     if (!user) throw new BadRequestException('user doesn\'t exist');
-
+    Object.assign(user, updateUserDto);
+    return this.userRepo.save(user);
   }
 
   remove(id: number) {
@@ -49,5 +64,10 @@ export class UsersService {
 
   async findUserByEmail(email: string) {
     return await this.userRepo.findOneBy({ email });
+  }
+
+  async accessToken(user: UserEntity): Promise<string> {
+
+    return sign({ id: user.id, email: user.email }, process.env.ACCESS_TOKEN_SECRET_KEY!, { expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRE_TIME!) });
   }
 }
