@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -43,19 +43,25 @@ export class UsersService {
     return userExist;
   }
 
-  findAll() {
-    return this.userRepo.find();
+  async findAll(): Promise<UserEntity[]> {
+    return await this.userRepo.find();
   }
 
-  findOne(id: number) {
-    return this.userRepo.findOneBy({ id });
+  async findOne(id: number): Promise<UserEntity | null> {
+    const user = await this.userRepo.findOneBy({ id });
+    if (!user) throw new NotFoundException('there is no user by this id');
+    return user;
   }
 
   async updateUser(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.userRepo.findOneBy({ id });
     if (!user) throw new BadRequestException('user doesn\'t exist');
-    Object.assign(user, updateUserDto);
-    return this.userRepo.save(user);
+    // console.log(updateUserDto);
+    Object.assign(user!, updateUserDto);
+    const update = await this.userRepo.save(user);
+    // console.log(update);
+    // console.log(updateUserDto.email);
+    return update;
   }
 
   remove(id: number) {
@@ -67,7 +73,10 @@ export class UsersService {
   }
 
   async accessToken(user: UserEntity): Promise<string> {
-
-    return sign({ id: user.id, email: user.email }, process.env.ACCESS_TOKEN_SECRET_KEY!, { expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRE_TIME!) });
+    return sign(
+      { id: user.id, email: user.email },
+      process.env.ACCESS_TOKEN_SECRET_KEY!,
+      { expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRE_TIME!) }
+    );
   }
 }
