@@ -18,6 +18,6 @@ export class CategoryEntity {
 
     @ManyToOne(() => UserEntity, (user) => user.categories)
     addedBy: UserEntity;
-    @OneToMany(() => ProductEntity, (prod) => prod.categories)
+    @OneToMany(() => ProductEntity, (prod) => prod.category)
     products: ProductEntity[];
 }
