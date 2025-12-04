@@ -3,6 +3,7 @@ import { config } from 'dotenv'
 
 config()
 export const dataSourceOptions: DataSourceOptions = {
+    url: process.env.DATABASE_URL,
     type: 'postgres',
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
@@ -11,8 +12,8 @@ export const dataSourceOptions: DataSourceOptions = {
     database: process.env.DB_DATABASE,
     entities: ['dist/**/*.entity{.ts,.js}'],
     migrations: ['dist/db/migration/*{.ts,.js}'],
-    logging: false,
-    synchronize: false,
+    logging: true,
+    synchronize: false
 
 }
 
