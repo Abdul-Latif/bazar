@@ -9,6 +9,7 @@ import { AuthorizeGuard } from 'src/utilities/guards/autherization.guard';
 import { Roles } from 'src/utilities/common/role-enum';
 import { AuthorizedRoles } from 'src/utilities/decorators/authorize-roles.decorator';
 import { ProductEntity } from './entities/product.entity';
+import { ApiOperation, ApiQuery, ApiResponse, ApiSecurity } from '@nestjs/swagger'
 
 @Controller('products')
 export class ProductsController {
@@ -23,18 +24,23 @@ export class ProductsController {
 
   @AuthorizedRoles(Roles.ADMIN)
   @UseGuards(AuthenticationGuard, AuthorizeGuard)
+  @ApiSecurity('bearer')
   @Get()
   async findAll(): Promise<ProductEntity[]> {
     return await this.productsService.findAll();
   }
 
   @Get(':id')
+  @ApiResponse({ description: "what the fuck was that" })
+  @ApiOperation({ summary: 'get product by id' })
+
   async findOne(@Param('id') id: string): Promise<ProductEntity> {
     return this.productsService.findOne(+id);
   }
 
   @AuthorizedRoles(Roles.ADMIN)
   @UseGuards(AuthenticationGuard, AuthorizeGuard)
+  @ApiSecurity('bearer')
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto, @CurrentUser() currentUser: UserEntity): Promise<ProductEntity> {
     return await this.productsService.update(+id, updateProductDto, currentUser);
