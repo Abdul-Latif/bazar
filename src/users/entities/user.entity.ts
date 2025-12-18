@@ -4,6 +4,7 @@ import { CategoryEntity } from "src/category/entities/category.entity";
 import { ProductEntity } from "src/products/entities/product.entity";
 import { ReviewEntity } from "src/reviews/entities/review.entity";
 import { OrderEntity } from "src/orders/entities/order.entity";
+import { FavoriteEntity } from "src/favorites/entities/favorite.entity";
 
 @Entity('users')
 export class UserEntity {
@@ -30,4 +31,7 @@ export class UserEntity {
     reviews: ReviewEntity[];
     @OneToMany(() => OrderEntity, (order) => order.orderdBy)
     orders: OrderEntity[];
+
+    @OneToMany(() => FavoriteEntity, (fav) => fav.user)
+    favorites: FavoriteEntity[];
 }

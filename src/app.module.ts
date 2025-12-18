@@ -8,9 +8,10 @@ import { CategoryModule } from './category/category.module';
 import { ProductsModule } from './products/products.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { OrdersModule } from './orders/orders.module';
+import { FavoritesModule } from './favorites/favorites.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(dataSourceOptions), UsersModule, CategoryModule, ProductsModule, ReviewsModule, OrdersModule],
+  imports: [TypeOrmModule.forRoot(dataSourceOptions), UsersModule, CategoryModule, ProductsModule, ReviewsModule, OrdersModule, FavoritesModule],
   controllers: [],
   providers: [],
 })
