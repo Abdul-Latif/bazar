@@ -26,7 +26,7 @@ async function bootstrap() {
 
   // const swaggerOptions: SwaggerUiOptions = {}
   const options: SwaggerCustomOptions = {
-    // ui: false,
+    ui: true,
     explorer: true,
     jsonDocumentUrl: 'docs/json',
     // swaggerOptions: swaggerOptions,

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FavoriteEntity } from './entities/favorite.entity';
 import { Repository } from 'typeorm';
@@ -24,10 +24,30 @@ export class FavoritesService {
     const fav = await this.favRepo.findOne({
       where: {
         user: { id: userid },
-        product: { id: productId }
-      }
+        product: { id: productId },
+      }, withDeleted: true
     });
-    if (fav) throw new HttpException('already favorited', HttpStatus.CONFLICT)
+    // console.log(fav)
+    // if (fav) {
+    //   throw new HttpException('already favorited', HttpStatus.CONFLICT);
+    // }
+    // else if (product.id) {
+    //   const fav = await this.favRepo.findOne({ where: { product: { id: productId } } })
+    //   if (!fav) throw new BadRequestException();
+    //   fav.Deleted_Date = null;
+    //   return await this.favRepo.save(fav);
+    // }
+    // else if (!fav) {
+    //   const fav = this.favRepo.create({ user, product });
+    //   return await this.favRepo.save(fav)
+    // }
+
+    if (fav && fav.Deleted_Date) {
+      fav.Deleted_Date = null;
+      return await this.favRepo.save(fav);
+    }
+
+    if (fav) throw new HttpException('already favorited', HttpStatus.CONFLICT);
 
     const favorite = this.favRepo.create({ user, product });
     return await this.favRepo.save(favorite);

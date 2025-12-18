@@ -8,12 +8,12 @@ export class CreateUserDto {
     name: string;
 
     @IsEmail()
-    @ApiProperty()
+    @ApiProperty({ description: 'enter a valid email' })
     email: string;
 
     @IsString()
     @MinLength(6)
-    @ApiProperty()
+    @ApiProperty({ description: 'enter a proper password' })
     password: string;
 
 }

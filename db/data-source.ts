@@ -10,7 +10,7 @@ export const dataSourceOptions: DataSourceOptions = {
     database: process.env.DB_DATABASE,
     host: process.env.DB_HOST,
     entities: ['dist/**/*.entity{.ts,.js}'],
-    migrations: ['dist/db/migrations/*{.ts,.js}'],
+    migrations: [__dirname + 'dist/db/migrations/*{.ts,.js}'],
     logging: false,
     synchronize: false
 }
